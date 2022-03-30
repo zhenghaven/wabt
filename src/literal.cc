@@ -40,7 +40,7 @@ struct FloatTraitsBase<float> {
   typedef uint32_t Uint;
   static constexpr int kBits = sizeof(Uint) * 8;
   static constexpr int kSigBits = 23;
-  static constexpr float kHugeVal = HUGE_VALF;
+  static constexpr float kHugeVal = std::numeric_limits<float>::infinity();
   static constexpr int kMaxHexBufferSize = WABT_MAX_FLOAT_HEX;
 
   static float Strto(const char* s, char** endptr) { return strtof(s, endptr); }
@@ -51,7 +51,7 @@ struct FloatTraitsBase<double> {
   typedef uint64_t Uint;
   static constexpr int kBits = sizeof(Uint) * 8;
   static constexpr int kSigBits = 52;
-  static constexpr float kHugeVal = HUGE_VAL;
+  static constexpr float kHugeVal = std::numeric_limits<double>::infinity();
   static constexpr int kMaxHexBufferSize = WABT_MAX_DOUBLE_HEX;
 
   static double Strto(const char* s, char** endptr) {
@@ -472,13 +472,13 @@ void FloatWriter<T>::WriteHex(char* out, size_t size, Uint bits) {
   if (exp == Traits::kMaxExp) {
     // Infinity or nan.
     if (sig == 0) {
-      strcpy(p, "inf");
+      wabt_strcpy(p, "inf");
       p += 3;
     } else {
-      strcpy(p, "nan");
+      wabt_strcpy(p, "nan");
       p += 3;
       if (sig != Traits::kQuietNanTag) {
-        strcpy(p, ":0x");
+        wabt_strcpy(p, ":0x");
         p += 3;
         // Skip leading zeroes.
         int num_nybbles = kNumNybbles;
@@ -496,7 +496,7 @@ void FloatWriter<T>::WriteHex(char* out, size_t size, Uint bits) {
     }
   } else {
     bool is_zero = sig == 0 && exp == Traits::kMinExp;
-    strcpy(p, "0x");
+    wabt_strcpy(p, "0x");
     p += 2;
     *p++ = is_zero ? '0' : '1';
 
@@ -524,7 +524,7 @@ void FloatWriter<T>::WriteHex(char* out, size_t size, Uint bits) {
     }
     *p++ = 'p';
     if (is_zero) {
-      strcpy(p, "+0");
+      wabt_strcpy(p, "+0");
       p += 2;
     } else {
       if (exp < 0) {

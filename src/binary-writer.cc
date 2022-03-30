@@ -22,7 +22,11 @@
 #include <cstdint>
 #include <cstdio>
 #include <set>
+#ifdef INTEL_SGX
+#include <sgx_string_view.h>
+#else
 #include <string_view>
+#endif /* INTEL_SGX */
 #include <vector>
 
 #include "config.h"
@@ -99,7 +103,7 @@ namespace {
 static const size_t LEB_SECTION_SIZE_GUESS = 1;
 
 #define ALLOC_FAILURE \
-  fprintf(stderr, "%s:%d: allocation failed\n", __FILE__, __LINE__)
+  wabt_fprintf(stderr, "%s:%d: allocation failed\n", __FILE__, __LINE__)
 
 struct RelocSection {
   RelocSection(const char* name, Index index)
@@ -230,7 +234,7 @@ class SymbolTable {
 
   Result EnsureUnique(const std::string_view& name) {
     if (seen_names_.count(name)) {
-      fprintf(stderr,
+      wabt_fprintf(stderr,
               "error: duplicate symbol when writing relocatable "
               "binary: %s\n",
               &name[0]);
@@ -610,7 +614,7 @@ Index BinaryWriter::GetSymbolIndex(RelocType reloc_type, Index index) {
       // index is used directly.
       return index;
     default:
-      fprintf(stderr, "warning: unsupported relocation type: %s\n",
+      wabt_fprintf(stderr, "warning: unsupported relocation type: %s\n",
               GetRelocTypeName(reloc_type));
       return kInvalidIndex;
   }
@@ -1234,7 +1238,7 @@ void BinaryWriter::WriteRelocSection(const RelocSection* reloc_section) {
       case RelocType::TableNumberLEB:
         break;
       default:
-        fprintf(stderr, "warning: unsupported relocation type: %s\n",
+        wabt_fprintf(stderr, "warning: unsupported relocation type: %s\n",
                 GetRelocTypeName(reloc.type));
     }
   }

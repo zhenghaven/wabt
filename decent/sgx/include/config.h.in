@@ -34,7 +34,7 @@
 #define HAVE_SNPRINTF 1
 
 /* Whether ssize_t is defined by stddef.h */
-#define HAVE_SSIZE_T 1
+#define HAVE_SSIZE_T 0
 
 /* Whether strcasecmp is defined by strings.h */
 #define HAVE_STRCASECMP 1
@@ -277,6 +277,21 @@ int wabt_snprintf(char* str, size_t size, const char* format, ...);
 #else
 #error no snprintf
 #endif
+
+#ifdef SECURE_ENCLAVE_ENV
+#define wabt_fprintf(T, ...)
+inline char* wabt_strcpy(char* dest, const char* src)
+{ // src: https://www.techiedelight.com/implement-strcpy-function-c/
+  if (dest == NULL) { return NULL; }
+  char *ptr = dest;
+  while (*src != '\0') { *dest++ = *src++; }
+  *dest = '\0';
+  return ptr;
+}
+#else
+#define wabt_fprintf fprintf
+#define wabt_strcpy strcpy
+#endif /* SECURE_ENCLAVE_ENV */
 
 #if COMPILER_IS_MSVC
 /* can't just use vsnprintf because it doesn't always null terminate */

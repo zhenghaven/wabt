@@ -212,7 +212,7 @@ void WABT_PRINTF_FORMAT(2, 3) BinaryReader::PrintError(const char* format,
 
   if (!handled) {
     // Not great to just print, but we don't want to eat the error either.
-    fprintf(stderr, "%07" PRIzx ": %s: %s\n", state_.offset,
+    wabt_fprintf(stderr, "%07" PRIzx ": %s: %s\n", state_.offset,
             GetErrorLevelName(error_level), buffer);
   }
 }

@@ -22,7 +22,11 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#ifdef INTEL_SGX
+#include <sgx_string_view.h>
+#else
 #include <string_view>
+#endif /* INTEL_SGX */
 #include <type_traits>
 #include <vector>
 

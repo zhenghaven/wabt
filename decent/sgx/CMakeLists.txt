@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.14)
 
 project(wabt-decent-sgx LANGUAGES C CXX VERSION 1.0.28)
 
@@ -29,16 +29,25 @@ check_type_size(ssize_t SSIZE_T)
 check_type_size(size_t SIZEOF_SIZE_T)
 
 configure_file(
-	${CMAKE_CURRENT_LIST_DIR}/config.h.in
-	${CMAKE_CURRENT_BINARY_DIR}/config.h
+	${CMAKE_CURRENT_LIST_DIR}/include/config.h.in
+	${CMAKE_CURRENT_LIST_DIR}/include/config.h
 )
+
+if ((NOT DEFINED INTEL_SGX_SDK_INCLUDE_DIR) OR
+	(NOT DEFINED INTEL_SGX_SDK_LIBC_INCLUDE_DIR) OR
+	(NOT DEFINED INTEL_SGX_SDK_CXX_INCLUDE_DIR) OR
+	(NOT DEFINED INTEL_SGX_SDK_TRUSTED_C_FLAGS) OR
+	(NOT DEFINED INTEL_SGX_SDK_TRUSTED_CXX_FLAGS) OR
+	(NOT DEFINED INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS))
+	message(FATAL_ERROR "Required SGX CMake variables are not defined")
+endif()
 
 set(WABT_SOURCES_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
 
 set(WASM_WAT_LIBRARY_SRC
-	${CMAKE_CURRENT_BINARY_DIR}/config.h
+	${CMAKE_CURRENT_LIST_DIR}/include/config.h
 
-	${WABT_SOURCES_ROOT_DIR}/src/apply-names.h  # executable
+	${WABT_SOURCES_ROOT_DIR}/src/apply-names.h
 	${WABT_SOURCES_ROOT_DIR}/src/apply-names.cc
 	${WABT_SOURCES_ROOT_DIR}/src/binary.h
 	${WABT_SOURCES_ROOT_DIR}/src/binary.cc
@@ -50,30 +59,30 @@ set(WASM_WAT_LIBRARY_SRC
 	${WABT_SOURCES_ROOT_DIR}/src/binary-reader-logging.cc
 	${WABT_SOURCES_ROOT_DIR}/src/binary-writer.h
 	${WABT_SOURCES_ROOT_DIR}/src/binary-writer.cc
-	${WABT_SOURCES_ROOT_DIR}/src/binary-writer-spec.h
-	${WABT_SOURCES_ROOT_DIR}/src/binary-writer-spec.cc
+	# ${WABT_SOURCES_ROOT_DIR}/src/binary-writer-spec.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/binary-writer-spec.cc
 	${WABT_SOURCES_ROOT_DIR}/src/binding-hash.h
 	${WABT_SOURCES_ROOT_DIR}/src/binding-hash.cc
-	${WABT_SOURCES_ROOT_DIR}/src/color.h
-	${WABT_SOURCES_ROOT_DIR}/src/color.cc
-	${WABT_SOURCES_ROOT_DIR}/src/common.h  # executable
+	# ${WABT_SOURCES_ROOT_DIR}/src/color.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/color.cc
+	${WABT_SOURCES_ROOT_DIR}/src/common.h
 	${WABT_SOURCES_ROOT_DIR}/src/common.cc
-	# src/config.h.in
+	# ${WABT_SOURCES_ROOT_DIR}/src/config.h.in
 	${WABT_SOURCES_ROOT_DIR}/src/config.cc
-	# src/decompiler.h
-	# src/decompiler-ast.h
-	# src/decompiler-ls.h
-	# src/decompiler-naming.h
-	# src/decompiler.cc
-	${WABT_SOURCES_ROOT_DIR}/src/error-formatter.h
-	${WABT_SOURCES_ROOT_DIR}/src/error-formatter.cc
+	# ${WABT_SOURCES_ROOT_DIR}/src/decompiler.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/decompiler-ast.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/decompiler-ls.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/decompiler-naming.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/decompiler.cc
+	# ${WABT_SOURCES_ROOT_DIR}/src/error-formatter.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/error-formatter.cc
 	${WABT_SOURCES_ROOT_DIR}/src/expr-visitor.h
 	${WABT_SOURCES_ROOT_DIR}/src/expr-visitor.cc
-	${WABT_SOURCES_ROOT_DIR}/src/feature.h  # executable
+	${WABT_SOURCES_ROOT_DIR}/src/feature.h
 	${WABT_SOURCES_ROOT_DIR}/src/feature.cc
-	${WABT_SOURCES_ROOT_DIR}/src/filenames.h  # executable
-	${WABT_SOURCES_ROOT_DIR}/src/filenames.cc
-	${WABT_SOURCES_ROOT_DIR}/src/generate-names.h  # executable
+	# ${WABT_SOURCES_ROOT_DIR}/src/filenames.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/filenames.cc
+	${WABT_SOURCES_ROOT_DIR}/src/generate-names.h
 	${WABT_SOURCES_ROOT_DIR}/src/generate-names.cc
 	${WABT_SOURCES_ROOT_DIR}/src/ir.h
 	${WABT_SOURCES_ROOT_DIR}/src/ir.cc
@@ -81,29 +90,29 @@ set(WASM_WAT_LIBRARY_SRC
 	${WABT_SOURCES_ROOT_DIR}/src/ir-util.cc
 	${WABT_SOURCES_ROOT_DIR}/src/leb128.h
 	${WABT_SOURCES_ROOT_DIR}/src/leb128.cc
-	${WABT_SOURCES_ROOT_DIR}/src/lexer-source.h
+	${WABT_SOURCES_ROOT_DIR}/src/lexer-source.h # Wat2Wasm
 	${WABT_SOURCES_ROOT_DIR}/src/lexer-source.cc
-	${WABT_SOURCES_ROOT_DIR}/src/lexer-source-line-finder.h
-	${WABT_SOURCES_ROOT_DIR}/src/lexer-source-line-finder.cc
+	# ${WABT_SOURCES_ROOT_DIR}/src/lexer-source-line-finder.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/lexer-source-line-finder.cc
 	${WABT_SOURCES_ROOT_DIR}/src/literal.h
 	${WABT_SOURCES_ROOT_DIR}/src/literal.cc
 	${WABT_SOURCES_ROOT_DIR}/src/opcode.h
 	${WABT_SOURCES_ROOT_DIR}/src/opcode.cc
 	${WABT_SOURCES_ROOT_DIR}/src/opcode-code-table.h
 	${WABT_SOURCES_ROOT_DIR}/src/opcode-code-table.c
-	${WABT_SOURCES_ROOT_DIR}/src/option-parser.h
-	${WABT_SOURCES_ROOT_DIR}/src/option-parser.cc
-	${WABT_SOURCES_ROOT_DIR}/src/resolve-names.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/option-parser.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/option-parser.cc
+	${WABT_SOURCES_ROOT_DIR}/src/resolve-names.h # Wat2Wasm
 	${WABT_SOURCES_ROOT_DIR}/src/resolve-names.cc
 	${WABT_SOURCES_ROOT_DIR}/src/shared-validator.h
 	${WABT_SOURCES_ROOT_DIR}/src/shared-validator.cc
-	${WABT_SOURCES_ROOT_DIR}/src/stream.h  # executable
+	${WABT_SOURCES_ROOT_DIR}/src/stream.h
 	${WABT_SOURCES_ROOT_DIR}/src/stream.cc
-	# src/string-util.h
-	${WABT_SOURCES_ROOT_DIR}/src/token.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/string-util.h
+	${WABT_SOURCES_ROOT_DIR}/src/token.h # Wat2Wasm
 	${WABT_SOURCES_ROOT_DIR}/src/token.cc
-	# src/tracing.h
-	# src/tracing.cc
+	# ${WABT_SOURCES_ROOT_DIR}/src/tracing.h
+	# ${WABT_SOURCES_ROOT_DIR}/src/tracing.cc
 	${WABT_SOURCES_ROOT_DIR}/src/type.h
 	${WABT_SOURCES_ROOT_DIR}/src/type-checker.h
 	${WABT_SOURCES_ROOT_DIR}/src/type-checker.cc
@@ -131,21 +140,25 @@ set(WASM_WAT_LIBRARY_SRC
 #   src/interp/istream.cc
 )
 
-add_library(libwasmwat STATIC ${WASM_WAT_LIBRARY_SRC})
-target_include_directories(libwasmwat
-	PRIVATE ${WABT_SOURCES_ROOT_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-set_property(TARGET libwasmwat PROPERTY CXX_STANDARD 17)
+add_library(DecentWasmWat_core STATIC ${WASM_WAT_LIBRARY_SRC})
 
-#wat2wasm
-add_executable(wat2wasm ${WABT_SOURCES_ROOT_DIR}/src/tools/wat2wasm.cc)
-target_link_libraries(wat2wasm libwasmwat)
-target_include_directories(wat2wasm
-	PRIVATE ${WABT_SOURCES_ROOT_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-set_property(TARGET wat2wasm PROPERTY CXX_STANDARD 17)
+target_include_directories(DecentWasmWat_core
+	PRIVATE ${WABT_SOURCES_ROOT_DIR}
+			${INTEL_SGX_SDK_INCLUDE_DIR}
+			${INTEL_SGX_SDK_LIBC_INCLUDE_DIR}
+			${INTEL_SGX_SDK_CXX_INCLUDE_DIR}
+	PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
 
-#wasm2wat
-add_executable(wasm2wat ${WABT_SOURCES_ROOT_DIR}/src/tools/wasm2wat.cc)
-target_link_libraries(wasm2wat libwasmwat)
-target_include_directories(wasm2wat
-	PRIVATE ${WABT_SOURCES_ROOT_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-set_property(TARGET wasm2wat PROPERTY CXX_STANDARD 17)
+target_compile_definitions(DecentWasmWat_core
+	PRIVATE SECURE_ENCLAVE_ENV INTEL_SGX)
+
+target_compile_options(DecentWasmWat_core
+	PRIVATE ${INTEL_SGX_SDK_TRUSTED_C_FLAGS}
+			$<$<COMPILE_LANGUAGE:CXX>:${INTEL_SGX_SDK_TRUSTED_CXX_FLAGS}>)
+
+target_link_options(DecentWasmWat_core
+	PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
+
+set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 17)
+
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
