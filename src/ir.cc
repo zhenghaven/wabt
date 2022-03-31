@@ -575,7 +575,13 @@ void MakeTypeBindingReverseMapping(
     std::vector<std::string>* out_reverse_mapping) {
   out_reverse_mapping->clear();
   out_reverse_mapping->resize(num_types);
+#if __cplusplus < 201703L
+  for (const auto& itval : bindings) {
+    const auto& name = itval.first;
+    const auto& binding = itval.second;
+#else
   for (const auto& [name, binding] : bindings) {
+#endif
     assert(static_cast<size_t>(binding.index) < out_reverse_mapping->size());
     (*out_reverse_mapping)[binding.index] = name;
   }

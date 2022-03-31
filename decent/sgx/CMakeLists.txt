@@ -159,6 +159,6 @@ target_compile_options(DecentWasmWat_core
 target_link_options(DecentWasmWat_core
 	PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
 
-set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 17)
+set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 11)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)

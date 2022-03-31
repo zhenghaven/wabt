@@ -93,6 +93,20 @@
 #define WABT_STATIC_ASSERT(x) _Static_assert((x), #x)
 #endif
 
+#elif COMPILER_IS_MSVC && defined(INTEL_SGX)
+
+#include <string.h>
+
+#define WABT_UNUSED
+#define WABT_WARN_UNUSED
+#define WABT_INLINE __inline
+#define WABT_STATIC_ASSERT(x) static_assert((x), #x)
+#define WABT_UNLIKELY(x) (x)
+#define WABT_LIKELY(x) (x)
+#define WABT_PRINTF_FORMAT(format_arg, first_arg)
+
+#define WABT_VECTORCALL __vectorcall
+
 #elif COMPILER_IS_MSVC
 
 #include <intrin.h>
@@ -293,11 +307,15 @@ inline char* wabt_strcpy(char* dest, const char* src)
 #define wabt_strcpy strcpy
 #endif /* SECURE_ENCLAVE_ENV */
 
+#if COMPILER_IS_MSVC && defined(INTEL_SGX)
+#define wabt_vsnprintf vsnprintf
+#else
 #if COMPILER_IS_MSVC
 /* can't just use vsnprintf because it doesn't always null terminate */
 int wabt_vsnprintf(char* str, size_t size, const char* format, va_list ap);
 #else
 #define wabt_vsnprintf vsnprintf
+#endif
 #endif
 
 #if !HAVE_SSIZE_T

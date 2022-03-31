@@ -26,4 +26,4 @@ target_compile_options(DecentWasmWat
 target_link_options(DecentWasmWat
 	PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
 
-set_property(TARGET DecentWasmWat PROPERTY CXX_STANDARD 17)
+set_property(TARGET DecentWasmWat PROPERTY CXX_STANDARD 11)
