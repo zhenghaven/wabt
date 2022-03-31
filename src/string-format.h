@@ -31,6 +31,24 @@
   (static_cast<int32_t>(x) < 0 ? "-" : ""), std::abs(static_cast<int32_t>(x))
 
 #define WABT_DEFAULT_SNPRINTF_ALLOCA_BUFSIZE 128
+#if COMPILER_IS_MSVC && defined(INTEL_SGX)
+#define WABT_SNPRINTF_ALLOCA(buffer, len, format)                          \
+  std::unique_ptr<char[]> bufferUniquePtr;                                 \
+  va_list args;                                                            \
+  va_list args_copy;                                                       \
+  va_start(args, format);                                                  \
+  va_copy(args_copy, args);                                                \
+  char fixed_buf[WABT_DEFAULT_SNPRINTF_ALLOCA_BUFSIZE];                    \
+  char* buffer = fixed_buf;                                                \
+  size_t len = wabt_vsnprintf(fixed_buf, sizeof(fixed_buf), format, args); \
+  va_end(args);                                                            \
+  if (len + 1 > sizeof(fixed_buf)) {                                       \
+    bufferUniquePtr = std::unique_ptr<char[]>(new char[len + 1]());        \
+    buffer = bufferUniquePtr.get();                                        \
+    len = wabt_vsnprintf(buffer, len + 1, format, args_copy);              \
+  }                                                                        \
+  va_end(args_copy)
+#else
 #define WABT_SNPRINTF_ALLOCA(buffer, len, format)                          \
   va_list args;                                                            \
   va_list args_copy;                                                       \
@@ -45,6 +63,7 @@
     len = wabt_vsnprintf(buffer, len + 1, format, args_copy);              \
   }                                                                        \
   va_end(args_copy)
+#endif /* COMPILER_IS_MSVC && defined(INTEL_SGX) */
 
 namespace wabt {
 
