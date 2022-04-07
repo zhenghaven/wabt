@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 
 project(wabt-decent-sgx LANGUAGES C CXX VERSION 1.0.28)
 
@@ -164,6 +164,9 @@ if(${DECENT_WABT_ENABLE_ENCLAVE})
 	target_link_options(DecentWasmWat_core
 		PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
 
+	set_property(TARGET DecentWasmWat_core PROPERTY
+		MSVC_RUNTIME_LIBRARY
+			"MultiThreaded$<$<OR:$<CONFIG:Debug>, $<CONFIG:DebugSimulation> >:Debug>")
 	set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 11)
 endif()
 
@@ -177,6 +180,8 @@ target_include_directories(DecentWasmWat_core_untrusted
 	PRIVATE ${WABT_SOURCES_ROOT_DIR}
 	PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
 
+set_property(TARGET DecentWasmWat_core_untrusted PROPERTY
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set_property(TARGET DecentWasmWat_core_untrusted PROPERTY CXX_STANDARD 17)
 
 ##################################################

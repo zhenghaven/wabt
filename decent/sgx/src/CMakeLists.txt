@@ -3,7 +3,7 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 
 if(${DECENT_WABT_ENABLE_ENCLAVE})
 	add_library(DecentWasmWat STATIC ${CMAKE_CURRENT_LIST_DIR}/WasmWat.cc)
@@ -27,6 +27,9 @@ if(${DECENT_WABT_ENABLE_ENCLAVE})
 	target_link_options(DecentWasmWat
 		PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
 
+	set_property(TARGET DecentWasmWat PROPERTY
+		MSVC_RUNTIME_LIBRARY
+			"MultiThreaded$<$<OR:$<CONFIG:Debug>, $<CONFIG:DebugSimulation> >:Debug>")
 	set_property(TARGET DecentWasmWat PROPERTY CXX_STANDARD 11)
 endif()
 
@@ -42,4 +45,6 @@ target_include_directories(DecentWasmWat_untrusted
 
 target_link_libraries(DecentWasmWat_untrusted DecentWasmWat_core_untrusted)
 
+set_property(TARGET DecentWasmWat_untrusted PROPERTY
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set_property(TARGET DecentWasmWat_untrusted PROPERTY CXX_STANDARD 17)
