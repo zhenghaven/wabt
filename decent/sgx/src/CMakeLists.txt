@@ -27,3 +27,17 @@ target_link_options(DecentWasmWat
 	PRIVATE ${INTEL_SGX_SDK_TRUSTED_LINKER_FLAGS})
 
 set_property(TARGET DecentWasmWat PROPERTY CXX_STANDARD 11)
+
+##################################################
+# target for untrusted side, for testing purpose
+##################################################
+
+add_library(DecentWasmWat_untrusted STATIC ${CMAKE_CURRENT_LIST_DIR}/WasmWat.cc)
+
+target_include_directories(DecentWasmWat_untrusted
+	PRIVATE ${WABT_SOURCES_ROOT_DIR}
+			${CMAKE_CURRENT_LIST_DIR}/../include)
+
+target_link_libraries(DecentWasmWat_untrusted DecentWasmWat_core_untrusted)
+
+set_property(TARGET DecentWasmWat_untrusted PROPERTY CXX_STANDARD 17)

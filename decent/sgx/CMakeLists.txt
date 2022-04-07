@@ -158,4 +158,20 @@ target_link_options(DecentWasmWat_core
 
 set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 11)
 
+##################################################
+# target for untrusted side, for testing purpose
+##################################################
+
+add_library(DecentWasmWat_core_untrusted STATIC ${WASM_WAT_LIBRARY_SRC})
+
+target_include_directories(DecentWasmWat_core_untrusted
+	PRIVATE ${WABT_SOURCES_ROOT_DIR}
+	PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
+
+set_property(TARGET DecentWasmWat_core_untrusted PROPERTY CXX_STANDARD 17)
+
+##################################################
+# Add source directory
+##################################################
+
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)

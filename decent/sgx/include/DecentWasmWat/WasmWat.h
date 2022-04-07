@@ -12,8 +12,31 @@
 #include <string>
 #include <vector>
 
+namespace wabt
+{
+  struct Module;
+} // namespace wabt
+
 namespace DecentWasmWat
 {
+
+  struct ModWrapper
+  {
+    ModWrapper(wabt::Module* ptr) :
+      m_ptr(ptr)
+    {}
+
+    ~ModWrapper();
+
+    wabt::Module* release()
+    {
+      wabt::Module* tmp = m_ptr;
+      m_ptr = nullptr;
+      return tmp;
+    }
+
+    wabt::Module* m_ptr;
+  }; // struct ModWrap
 
   struct Wat2WasmConfig
   {
@@ -121,6 +144,24 @@ namespace DecentWasmWat
     const std::string& filename,
     const std::string& watSrc,
     const Wat2WasmConfig& config);
+
+  ModWrapper Wasm2Mod(
+    const std::string& filename,
+    const std::vector<uint8_t>& wasmSrc,
+    const Wasm2WatConfig& config);
+
+  ModWrapper Wat2Mod(
+    const std::string& filename,
+    const std::string& watSrc,
+    const Wat2WasmConfig& config);
+
+  struct FuncInfo
+  {
+    std::string name;
+  };
+
+  std::vector<FuncInfo> GetFuncsInfo(
+    const wabt::Module& mod);
 
 }  // namespace DecentWasmWat
 
