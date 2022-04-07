@@ -155,6 +155,14 @@ namespace DecentWasmWat
     const std::string& watSrc,
     const Wat2WasmConfig& config);
 
+  std::string Mod2Wat(
+    const wabt::Module& mod,
+    const Wasm2WatConfig& config);
+
+  std::vector<uint8_t> Mod2Wasm(
+    const wabt::Module& mod,
+    const Wat2WasmConfig& config);
+
   struct FuncInfo
   {
     std::string name;

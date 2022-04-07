@@ -263,6 +263,26 @@ std::string DecentWasmWat::Wasm2Wat(
   return Internal::Mod2Wat(*mod, features, config);
 }
 
+// Module => WAT
+std::string DecentWasmWat::Mod2Wat(
+  const wabt::Module& mod,
+  const Wasm2WatConfig& config)
+{
+  wabt::Features features;
+
+  return Internal::Mod2Wat(mod, features, config);
+}
+
+// Module => WASM
+std::vector<uint8_t> DecentWasmWat::Mod2Wasm(
+  const wabt::Module& mod,
+  const Wat2WasmConfig& config)
+{
+  wabt::Features features;
+
+  return Internal::Mod2Wasm(mod, features, config);
+}
+
 std::vector<DecentWasmWat::FuncInfo> DecentWasmWat::GetFuncsInfo(
   const wabt::Module& mod)
 {
