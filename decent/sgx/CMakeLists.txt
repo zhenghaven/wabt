@@ -144,6 +144,15 @@ set(WASM_WAT_LIBRARY_SRC
 #   src/interp/istream.cc
 )
 
+set(COMMON_COMPILE_OPTIONS "")
+if(MSVC)
+	set(COMMON_COMPILE_OPTIONS ${COMMON_COMPILE_OPTIONS} "/wd4267")
+endif()
+
+##################################################
+# target for trusted side
+##################################################
+
 if(${DECENT_WABT_ENABLE_ENCLAVE})
 	add_library(DecentWasmWat_core STATIC ${WASM_WAT_LIBRARY_SRC})
 
@@ -183,6 +192,9 @@ target_include_directories(DecentWasmWat_core_untrusted
 set_property(TARGET DecentWasmWat_core_untrusted PROPERTY
 	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set_property(TARGET DecentWasmWat_core_untrusted PROPERTY CXX_STANDARD 17)
+
+target_compile_options(DecentWasmWat_core_untrusted
+	PRIVATE ${COMMON_COMPILE_OPTIONS})
 
 ##################################################
 # Add source directory
