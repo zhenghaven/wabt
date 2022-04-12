@@ -293,7 +293,7 @@ std::vector<DecentWasmWat::FuncInfo> DecentWasmWat::GetFuncsInfo(
     {
       res.push_back(
         {
-          .name = func->name
+          /* .name = */ func->name
         }
       );
     }

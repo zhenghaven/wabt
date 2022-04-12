@@ -189,3 +189,5 @@ set_property(TARGET DecentWasmWat_core_untrusted PROPERTY CXX_STANDARD 17)
 ##################################################
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
+
+set(WABT_SOURCES_ROOT_DIR ${WABT_SOURCES_ROOT_DIR} PARENT_SCOPE)
