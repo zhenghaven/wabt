@@ -26,7 +26,27 @@ namespace DecentWasmWat
       m_ptr(ptr)
     {}
 
+    ModWrapper(const ModWrapper&) = delete;
+
+    ModWrapper(ModWrapper&& other) :
+      m_ptr(other.m_ptr)
+    {
+      other.m_ptr = nullptr;
+    }
+
     ~ModWrapper();
+
+    ModWrapper& operator=(const ModWrapper&) = delete;
+
+    ModWrapper& operator=(ModWrapper&& other)
+    {
+      if (this != &other)
+      {
+        m_ptr = other.m_ptr;
+        other.m_ptr = nullptr;
+      }
+      return *this;
+    }
 
     wabt::Module* release()
     {
@@ -80,6 +100,7 @@ namespace DecentWasmWat
       stop_on_fist_error(true),
       fail_on_custom_section_error(true),
       generate_names(false),
+      apply_names(false),
       fold_exprs(false),
       inline_export(false),
       inline_import(false)
@@ -114,6 +135,13 @@ namespace DecentWasmWat
      *
      */
     bool generate_names;
+
+    /**
+     * @brief Use function, import, function type, parameter and local names
+     *        in Vars that reference them.
+     *
+     */
+    bool apply_names;
 
     /**
      * @brief Write folded expressions where possible

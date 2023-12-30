@@ -128,7 +128,7 @@ static std::unique_ptr<wabt::Module> Wasm2Mod(
       result = wabt::GenerateNames(module.get());
     }
 
-    if (wabt::Succeeded(result))
+    if (wabt::Succeeded(result) && config.apply_names)
     {
       /* TODO(binji): This shouldn't fail; if a name can't be applied
       * (because the index is invalid, say) it should just be skipped. */
