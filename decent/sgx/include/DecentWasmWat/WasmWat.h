@@ -58,13 +58,10 @@ namespace DecentWasmWat
     wabt::Module* m_ptr;
   }; // struct ModWrap
 
-  struct Wat2WasmConfig
+  struct ReadWatConfig
   {
-    Wat2WasmConfig() :
-      validate(true),
-      relocatable(false),
-      canonicalize_lebs(true),
-      write_debug_names(false)
+    ReadWatConfig() :
+      validate(true)
     {}
 
     /**
@@ -72,38 +69,17 @@ namespace DecentWasmWat
      *
      */
     bool validate;
+  }; // struct ReadWatConfig
 
-    /**
-     * @brief Create a relocatable wasm binary (suitable for linking with e.g. lld)
-     *
-     */
-    bool relocatable;
-
-    /**
-     * @brief Write all LEB128 sizes as their minimal size instead of 5-bytes
-     *
-     */
-    bool canonicalize_lebs;
-
-    /**
-     * @brief Write debug names to the generated binary file
-     *
-     */
-    bool write_debug_names;
-  };  // struct Wat2WasmConfig
-
-  struct Wasm2WatConfig
+  struct ReadWasmConfig
   {
-    Wasm2WatConfig() :
+    ReadWasmConfig() :
       validate(true),
       read_debug_names(true),
       stop_on_fist_error(true),
       fail_on_custom_section_error(true),
       generate_names(false),
-      apply_names(false),
-      fold_exprs(false),
-      inline_export(false),
-      inline_import(false)
+      apply_names(false)
     {}
 
     /**
@@ -142,6 +118,15 @@ namespace DecentWasmWat
      *
      */
     bool apply_names;
+  }; // struct ReadWasmConfig
+
+  struct WriteWatConfig
+  {
+    WriteWatConfig() :
+      fold_exprs(false),
+      inline_export(false),
+      inline_import(false)
+    {}
 
     /**
      * @brief Write folded expressions where possible
@@ -160,36 +145,64 @@ namespace DecentWasmWat
      *
      */
     bool inline_import;
+  }; // struct WriteWatConfig
 
-  };  // struct Wasm2WatConfig
+  struct WriteWasmConfig
+  {
+    WriteWasmConfig() :
+      relocatable(false),
+      canonicalize_lebs(true),
+      write_debug_names(false)
+    {}
+
+    /**
+     * @brief Create a relocatable wasm binary (suitable for linking with e.g. lld)
+     *
+     */
+    bool relocatable;
+
+    /**
+     * @brief Write all LEB128 sizes as their minimal size instead of 5-bytes
+     *
+     */
+    bool canonicalize_lebs;
+
+    /**
+     * @brief Write debug names to the generated binary file
+     *
+     */
+    bool write_debug_names;
+  }; // struct WriteWasmConfig
 
   std::string Wasm2Wat(
     const std::string& filename,
     const std::vector<uint8_t>& wasmSrc,
-    const Wasm2WatConfig& config);
+    const ReadWasmConfig& rWasmCfg,
+    const WriteWatConfig& wWatCfg);
 
   std::vector<uint8_t> Wat2Wasm(
     const std::string& filename,
     const std::string& watSrc,
-    const Wat2WasmConfig& config);
+  const ReadWatConfig& rWatCfg,
+  const WriteWasmConfig& wWasmCfg);
 
   ModWrapper Wasm2Mod(
     const std::string& filename,
     const std::vector<uint8_t>& wasmSrc,
-    const Wasm2WatConfig& config);
+    const ReadWasmConfig& rWasmCfg);
 
   ModWrapper Wat2Mod(
     const std::string& filename,
     const std::string& watSrc,
-    const Wat2WasmConfig& config);
+    const ReadWatConfig& rWatCfg);
 
   std::string Mod2Wat(
     const wabt::Module& mod,
-    const Wasm2WatConfig& config);
+    const WriteWatConfig& wWatCfg);
 
   std::vector<uint8_t> Mod2Wasm(
     const wabt::Module& mod,
-    const Wat2WasmConfig& config);
+    const WriteWasmConfig& wWasmCfg);
 
   struct FuncInfo
   {

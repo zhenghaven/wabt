@@ -100,7 +100,7 @@ static std::unique_ptr<wabt::Module> Wasm2Mod(
   const std::string& filename,
   const std::vector<uint8_t>& wasmSrc,
   const wabt::Features& features,
-  const DecentWasmWat::Wasm2WatConfig& config)
+  const DecentWasmWat::ReadWasmConfig& rWasmCfg)
 {
   wabt::Result result;
   wabt::Errors errors;
@@ -108,27 +108,27 @@ static std::unique_ptr<wabt::Module> Wasm2Mod(
   std::unique_ptr<wabt::Module> module =
     std::unique_ptr<wabt::Module>(new wabt::Module);
   wabt::ReadBinaryOptions options(features, nullptr,
-              config.read_debug_names,
-              config.stop_on_fist_error,
-              config.fail_on_custom_section_error);
+              rWasmCfg.read_debug_names,
+              rWasmCfg.stop_on_fist_error,
+              rWasmCfg.fail_on_custom_section_error);
   result = wabt::ReadBinaryIr(
     filename.c_str(), wasmSrc.data(), wasmSrc.size(),
     options, &errors, module.get());
 
   if (wabt::Succeeded(result))
   {
-    if (wabt::Succeeded(result) && config.validate)
+    if (wabt::Succeeded(result) && rWasmCfg.validate)
     {
       wabt::ValidateOptions options(features);
       result = wabt::ValidateModule(module.get(), &errors, options);
     }
 
-    if (config.generate_names)
+    if (rWasmCfg.generate_names)
     {
       result = wabt::GenerateNames(module.get());
     }
 
-    if (wabt::Succeeded(result) && config.apply_names)
+    if (wabt::Succeeded(result) && rWasmCfg.apply_names)
     {
       /* TODO(binji): This shouldn't fail; if a name can't be applied
       * (because the index is invalid, say) it should just be skipped. */
@@ -149,14 +149,14 @@ static std::unique_ptr<wabt::Module> Wasm2Mod(
 static std::vector<uint8_t> Mod2Wasm(
   const wabt::Module& mod,
   const wabt::Features& features,
-  const DecentWasmWat::Wat2WasmConfig& config)
+  const DecentWasmWat::WriteWasmConfig& wWasmCfg)
 {
   wabt::Result result;
 
   wabt::WriteBinaryOptions write_binary_options;
-  write_binary_options.relocatable       = config.relocatable;
-  write_binary_options.canonicalize_lebs = config.canonicalize_lebs;
-  write_binary_options.write_debug_names = config.write_debug_names;
+  write_binary_options.relocatable       = wWasmCfg.relocatable;
+  write_binary_options.canonicalize_lebs = wWasmCfg.canonicalize_lebs;
+  write_binary_options.write_debug_names = wWasmCfg.write_debug_names;
   write_binary_options.features          = features;
 
   wabt::MemoryStream stream;
@@ -176,14 +176,14 @@ static std::vector<uint8_t> Mod2Wasm(
 static std::string Mod2Wat(
   const wabt::Module& mod,
   const wabt::Features& features,
-  const DecentWasmWat::Wasm2WatConfig& config)
+  const DecentWasmWat::WriteWatConfig& wWatCfg)
 {
   wabt::Result result;
 
   wabt::WriteWatOptions write_wat_options;
-  write_wat_options.fold_exprs    = config.fold_exprs;
-  write_wat_options.inline_export = config.inline_export;
-  write_wat_options.inline_import = config.inline_import;
+  write_wat_options.fold_exprs    = wWatCfg.fold_exprs;
+  write_wat_options.inline_export = wWatCfg.inline_export;
+  write_wat_options.inline_import = wWatCfg.inline_import;
 
   wabt::MemoryStream stream;
   result = wabt::WriteWat(&stream, &mod, write_wat_options);
@@ -214,73 +214,75 @@ DecentWasmWat::ModWrapper::~ModWrapper()
 DecentWasmWat::ModWrapper DecentWasmWat::Wat2Mod(
   const std::string& filename,
   const std::string& watSrc,
-  const Wat2WasmConfig& config)
+  const ReadWatConfig& rWatCfg)
 {
   wabt::Result result;
   wabt::Features features;
 
   return Internal::Wat2Mod(
-    filename, watSrc, features, config.validate).release();
+    filename, watSrc, features, rWatCfg.validate).release();
 }
 
 // WAT => WASM
 std::vector<uint8_t> DecentWasmWat::Wat2Wasm(
   const std::string& filename,
   const std::string& watSrc,
-  const Wat2WasmConfig& config)
+  const ReadWatConfig& rWatCfg,
+  const WriteWasmConfig& wWasmCfg)
 {
   wabt::Features features;
 
   std::unique_ptr<wabt::Module> mod = Internal::Wat2Mod(
-    filename, watSrc, features, config.validate);
+    filename, watSrc, features, rWatCfg.validate);
 
-  return Internal::Mod2Wasm(*mod, features, config);
+  return Internal::Mod2Wasm(*mod, features, wWasmCfg);
 }
 
 // WASM => Module
 DecentWasmWat::ModWrapper DecentWasmWat::Wasm2Mod(
   const std::string& filename,
   const std::vector<uint8_t>& wasmSrc,
-  const Wasm2WatConfig& config)
+  const ReadWasmConfig& rWasmCfg)
 {
   wabt::Features features;
 
   return Internal::Wasm2Mod(
-    filename, wasmSrc, features, config).release();
+    filename, wasmSrc, features, rWasmCfg).release();
 }
 
 // WASM => WAT
 std::string DecentWasmWat::Wasm2Wat(
   const std::string& filename,
   const std::vector<uint8_t>& wasmSrc,
-  const Wasm2WatConfig& config)
+  const ReadWasmConfig& rWasmCfg,
+  const WriteWatConfig& wWatCfg)
 {
   wabt::Features features;
 
   std::unique_ptr<wabt::Module> mod = Internal::Wasm2Mod(
-    filename, wasmSrc, features, config);
+    filename, wasmSrc, features, rWasmCfg);
 
-  return Internal::Mod2Wat(*mod, features, config);
+  return Internal::Mod2Wat(*mod, features, wWatCfg);
 }
 
 // Module => WAT
 std::string DecentWasmWat::Mod2Wat(
   const wabt::Module& mod,
-  const Wasm2WatConfig& config)
+  const WriteWatConfig& wWatCfg)
 {
   wabt::Features features;
 
-  return Internal::Mod2Wat(mod, features, config);
+  return Internal::Mod2Wat(mod, features, wWatCfg);
 }
 
 // Module => WASM
 std::vector<uint8_t> DecentWasmWat::Mod2Wasm(
   const wabt::Module& mod,
-  const Wat2WasmConfig& config)
+  const WriteWasmConfig& wWasmCfg)
 {
   wabt::Features features;
 
-  return Internal::Mod2Wasm(mod, features, config);
+  return Internal::Mod2Wasm(mod, features, wWasmCfg);
 }
 
 std::vector<DecentWasmWat::FuncInfo> DecentWasmWat::GetFuncsInfo(
