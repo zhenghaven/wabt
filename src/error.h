@@ -18,11 +18,7 @@
 #define WABT_ERROR_H_
 
 #include <string>
-#ifdef INTEL_SGX
-#include <sgx_string_view.h>
-#else
 #include <string_view>
-#endif /* INTEL_SGX */
 #include <vector>
 
 #include "src/common.h"

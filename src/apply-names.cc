@@ -18,11 +18,7 @@
 
 #include <cassert>
 #include <cstdio>
-#ifdef INTEL_SGX
-#include <sgx_string_view.h>
-#else
 #include <string_view>
-#endif /* INTEL_SGX */
 #include <vector>
 
 #include "src/cast.h"

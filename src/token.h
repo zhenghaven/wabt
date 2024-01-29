@@ -17,11 +17,7 @@
 #ifndef WABT_TOKEN_H_
 #define WABT_TOKEN_H_
 
-#ifdef INTEL_SGX
-#include <sgx_string_view.h>
-#else
 #include <string_view>
-#endif /* INTEL_SGX */
 
 #include "src/literal.h"
 #include "src/opcode.h"

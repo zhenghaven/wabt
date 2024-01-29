@@ -19,11 +19,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#ifdef INTEL_SGX
-#include <sgx_string_view.h>
-#else
 #include <string_view>
-#endif /* INTEL_SGX */
 
 #include "src/binary.h"
 #include "src/common.h"
