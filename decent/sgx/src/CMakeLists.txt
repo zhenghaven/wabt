@@ -22,7 +22,7 @@ if(${DECENTWABT_ENABLE_ENCLAVE})
 			${CMAKE_CURRENT_LIST_DIR}/../include
 	)
 
-	#target_link_libraries(DecentWasmWat_trusted DecentWasmWat_core)
+	#target_link_libraries(DecentWasmWat_trusted DecentWasmWat_core_trusted)
 
 	target_compile_definitions(
 		DecentWasmWat_trusted

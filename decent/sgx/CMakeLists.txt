@@ -46,12 +46,19 @@ if(${DECENTWABT_ENABLE_ENCLAVE})
 		(NOT DEFINED DECENTENCLAVE_SGXSDK_INCLUDE_CXX) OR
 		(NOT DEFINED DECENTENCLAVE_SGXSDK_TRUSTED_C_FLAGS) OR
 		(NOT DEFINED DECENTENCLAVE_SGXSDK_TRUSTED_CXX_FLAGS) OR
-		(NOT DEFINED DECENTENCLAVE_SGXSDK_TRUSTED_LINKER_FLAGS))
+		(NOT DEFINED DECENTENCLAVE_SGXSDK_TRUSTED_LINKER_FLAGS)
+	)
 		message(FATAL_ERROR "Required SGX CMake variables are not defined")
 	endif()
 endif()
 
-set(WABT_SOURCES_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
+set(
+	WABT_SOURCES_ROOT_DIR
+	${CMAKE_CURRENT_LIST_DIR}/../..
+	CACHE PATH
+	"Root directory of WABT sources"
+	FORCE
+)
 
 set(WASM_WAT_LIBRARY_SRC
 	${CMAKE_CURRENT_LIST_DIR}/include/config.h
@@ -159,30 +166,50 @@ endif()
 ##################################################
 
 if(${DECENTWABT_ENABLE_ENCLAVE})
-	add_library(DecentWasmWat_core STATIC ${WASM_WAT_LIBRARY_SRC})
+	add_library(DecentWasmWat_core_trusted STATIC ${WASM_WAT_LIBRARY_SRC})
 
-	target_include_directories(DecentWasmWat_core
-		PRIVATE ${WABT_SOURCES_ROOT_DIR}
-				${DECENTENCLAVE_SGXSDK_INCLUDE}
-				${DECENTENCLAVE_SGXSDK_INCLUDE_C}
-				${DECENTENCLAVE_SGXSDK_INCLUDE_CXX}
-		PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
+	target_include_directories(
+		DecentWasmWat_core_trusted
+		PRIVATE
+			${WABT_SOURCES_ROOT_DIR}
+			${DECENTENCLAVE_SGXSDK_INCLUDE}
+			${DECENTENCLAVE_SGXSDK_INCLUDE_C}
+			${DECENTENCLAVE_SGXSDK_INCLUDE_CXX}
+		PUBLIC
+			${CMAKE_CURRENT_LIST_DIR}/include
+	)
 
-	target_compile_definitions(DecentWasmWat_core
-		PRIVATE DECENT_ENCLAVE_TRUSTED
-				DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
+	target_compile_definitions(
+		DecentWasmWat_core_trusted
+		PRIVATE
+			DECENT_ENCLAVE_TRUSTED
+			DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED
+	)
 
-	target_compile_options(DecentWasmWat_core
-		PRIVATE ${DECENTENCLAVE_SGXSDK_TRUSTED_C_FLAGS}
-				$<$<COMPILE_LANGUAGE:CXX>:${DECENTENCLAVE_SGXSDK_TRUSTED_CXX_FLAGS}>)
+	target_compile_options(
+		DecentWasmWat_core_trusted
+		PRIVATE
+			${DECENTENCLAVE_SGXSDK_TRUSTED_C_FLAGS}
+			$<$<COMPILE_LANGUAGE:CXX>:${DECENTENCLAVE_SGXSDK_TRUSTED_CXX_FLAGS}>
+	)
 
-	target_link_options(DecentWasmWat_core
-		PRIVATE ${DECENTENCLAVE_SGXSDK_TRUSTED_LINKER_FLAGS})
+	target_link_options(
+		DecentWasmWat_core_trusted
+		PRIVATE
+			${DECENTENCLAVE_SGXSDK_TRUSTED_LINKER_FLAGS}
+	)
 
-	set_property(TARGET DecentWasmWat_core PROPERTY
-		MSVC_RUNTIME_LIBRARY
-			"MultiThreaded$<$<OR:$<CONFIG:Debug>, $<CONFIG:DebugSimulation> >:Debug>")
-	set_property(TARGET DecentWasmWat_core PROPERTY CXX_STANDARD 17)
+	set_property(
+		TARGET DecentWasmWat_core_trusted
+		PROPERTY
+			MSVC_RUNTIME_LIBRARY
+			"MultiThreaded$<$<OR:$<CONFIG:Debug>, $<CONFIG:DebugSimulation> >:Debug>"
+	)
+	set_property(
+		TARGET DecentWasmWat_core_trusted
+		PROPERTY
+			CXX_STANDARD 17
+	)
 endif()
 
 ##################################################
@@ -191,16 +218,30 @@ endif()
 
 add_library(DecentWasmWat_core_untrusted STATIC ${WASM_WAT_LIBRARY_SRC})
 
-target_include_directories(DecentWasmWat_core_untrusted
-	PRIVATE ${WABT_SOURCES_ROOT_DIR}
-	PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(
+	DecentWasmWat_core_untrusted
+	PRIVATE
+		${WABT_SOURCES_ROOT_DIR}
+	PUBLIC
+		${CMAKE_CURRENT_LIST_DIR}/include
+)
 
-set_property(TARGET DecentWasmWat_core_untrusted PROPERTY
-	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set_property(TARGET DecentWasmWat_core_untrusted PROPERTY CXX_STANDARD 17)
+target_compile_options(
+	DecentWasmWat_core_untrusted
+	PRIVATE
+		${COMMON_COMPILE_OPTIONS}
+)
 
-target_compile_options(DecentWasmWat_core_untrusted
-	PRIVATE ${COMMON_COMPILE_OPTIONS})
+set_property(
+	TARGET DecentWasmWat_core_untrusted
+	PROPERTY
+		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)
+set_property(
+	TARGET DecentWasmWat_core_untrusted
+	PROPERTY
+		CXX_STANDARD 17
+)
 
 ##################################################
 # Add source directory
@@ -208,4 +249,3 @@ target_compile_options(DecentWasmWat_core_untrusted
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
 
-set(WABT_SOURCES_ROOT_DIR ${WABT_SOURCES_ROOT_DIR} PARENT_SCOPE)
