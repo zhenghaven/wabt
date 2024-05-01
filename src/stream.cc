@@ -133,7 +133,7 @@ void Stream::WriteMemoryDump(const void* start,
 }
 
 Result OutputBuffer::WriteToFile(std::string_view filename) const {
-#ifdef SECURE_ENCLAVE_ENV
+#ifdef DECENT_ENCLAVE_TRUSTED
   return Result::Error;
 #else
   std::string filename_str(filename);
@@ -158,7 +158,7 @@ Result OutputBuffer::WriteToFile(std::string_view filename) const {
 
   fclose(file);
   return Result::Ok;
-#endif /* SECURE_ENCLAVE_ENV */
+#endif /* DECENT_ENCLAVE_TRUSTED */
 }
 
 MemoryStream::MemoryStream(Stream* log_stream)
@@ -221,7 +221,7 @@ Result MemoryStream::TruncateImpl(size_t size) {
   return Result::Ok;
 }
 
-#ifndef SECURE_ENCLAVE_ENV
+#ifndef DECENT_ENCLAVE_TRUSTED
 FileStream::FileStream(std::string_view filename, Stream* log_stream)
     : Stream(log_stream), file_(nullptr), offset_(0), should_close_(false) {
   std::string filename_str(filename);
@@ -319,6 +319,6 @@ std::unique_ptr<FileStream> FileStream::CreateStdout() {
 std::unique_ptr<FileStream> FileStream::CreateStderr() {
   return std::unique_ptr<FileStream>(new FileStream(stderr));
 }
-#endif /* !SECURE_ENCLAVE_ENV */
+#endif /* !DECENT_ENCLAVE_TRUSTED */
 
 }  // namespace wabt

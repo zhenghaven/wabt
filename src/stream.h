@@ -193,7 +193,7 @@ class MemoryStream : public Stream {
   std::unique_ptr<OutputBuffer> buf_;
 };
 
-#ifndef SECURE_ENCLAVE_ENV
+#ifndef DECENT_ENCLAVE_TRUSTED
 class FileStream : public Stream {
  public:
   WABT_DISALLOW_COPY_AND_ASSIGN(FileStream);
@@ -222,7 +222,7 @@ class FileStream : public Stream {
   size_t offset_;
   bool should_close_;
 };
-#endif /* !SECURE_ENCLAVE_ENV */
+#endif /* !DECENT_ENCLAVE_TRUSTED */
 
 }  // namespace wabt
 

@@ -4,9 +4,9 @@ project(wabt-decent-sgx LANGUAGES C CXX VERSION 1.0.28)
 
 include(DecentEnclaveIntelSgx)
 
-option(DECENT_WABT_ENABLE_ENCLAVE "Enable decent targets" ON)
+option(DECENTWABT_ENABLE_ENCLAVE "Enable decent targets" ON)
 if(DEFINED DECENT_FRAMEWORK_ENABLE_ENCLAVE)
-	set(DECENT_WABT_ENABLE_ENCLAVE ${DECENT_FRAMEWORK_ENABLE_ENCLAVE})
+	set(DECENTWABT_ENABLE_ENCLAVE ${DECENT_FRAMEWORK_ENABLE_ENCLAVE})
 endif()
 
 if (MSVC)
@@ -40,7 +40,7 @@ configure_file(
 	${CMAKE_CURRENT_LIST_DIR}/include/config.h
 )
 
-if(${DECENT_WABT_ENABLE_ENCLAVE})
+if(${DECENTWABT_ENABLE_ENCLAVE})
 	if ((NOT DEFINED DECENTENCLAVE_SGXSDK_INCLUDE) OR
 		(NOT DEFINED DECENTENCLAVE_SGXSDK_INCLUDE_C) OR
 		(NOT DEFINED DECENTENCLAVE_SGXSDK_INCLUDE_CXX) OR
@@ -158,7 +158,7 @@ endif()
 # target for trusted side
 ##################################################
 
-if(${DECENT_WABT_ENABLE_ENCLAVE})
+if(${DECENTWABT_ENABLE_ENCLAVE})
 	add_library(DecentWasmWat_core STATIC ${WASM_WAT_LIBRARY_SRC})
 
 	target_include_directories(DecentWasmWat_core
@@ -169,7 +169,8 @@ if(${DECENT_WABT_ENABLE_ENCLAVE})
 		PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
 
 	target_compile_definitions(DecentWasmWat_core
-		PRIVATE SECURE_ENCLAVE_ENV INTEL_SGX)
+		PRIVATE DECENT_ENCLAVE_TRUSTED
+				DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
 
 	target_compile_options(DecentWasmWat_core
 		PRIVATE ${DECENTENCLAVE_SGXSDK_TRUSTED_C_FLAGS}

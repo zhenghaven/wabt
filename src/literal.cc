@@ -159,13 +159,13 @@ Result FloatParser<T>::ParseFloat(const char* s,
   // so remove them first.
   assert(s <= end);
   const size_t kBufferSize = end - s + 1;  // +1 for \0.
-#if COMPILER_IS_MSVC && defined(INTEL_SGX)
+#if COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
   std::unique_ptr<char[]> bufferUniquePtr =
       std::unique_ptr<char[]>(new char[kBufferSize]());
   char* buffer = bufferUniquePtr.get();
 #else
   char* buffer = static_cast<char*>(alloca(kBufferSize));
-#endif /* COMPILER_IS_MSVC && defined(INTEL_SGX) */
+#endif /* COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED) */
   auto buffer_end =
       std::copy_if(s, end, buffer, [](char c) -> bool { return c != '_'; });
   assert(buffer_end < buffer + kBufferSize);

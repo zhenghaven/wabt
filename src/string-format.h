@@ -31,7 +31,7 @@
   (static_cast<int32_t>(x) < 0 ? "-" : ""), std::abs(static_cast<int32_t>(x))
 
 #define WABT_DEFAULT_SNPRINTF_ALLOCA_BUFSIZE 128
-#if COMPILER_IS_MSVC && defined(INTEL_SGX)
+#if COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
 #define WABT_SNPRINTF_ALLOCA(buffer, len, format)                          \
   std::unique_ptr<char[]> bufferUniquePtr;                                 \
   va_list args;                                                            \
@@ -63,7 +63,7 @@
     len = wabt_vsnprintf(buffer, len + 1, format, args_copy);              \
   }                                                                        \
   va_end(args_copy)
-#endif /* COMPILER_IS_MSVC && defined(INTEL_SGX) */
+#endif /* COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED) */
 
 namespace wabt {
 

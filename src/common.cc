@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <cstring>
 
-#ifndef SECURE_ENCLAVE_ENV
+#ifndef DECENT_ENCLAVE_TRUSTED
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -35,7 +35,7 @@
 #define stat _stat
 #define S_IFREG _S_IFREG
 #endif
-#endif /* !SECURE_ENCLAVE_ENV */
+#endif /* !DECENT_ENCLAVE_TRUSTED */
 
 namespace wabt {
 
@@ -61,7 +61,7 @@ const char* g_reloc_type_name[] = {
 };
 WABT_STATIC_ASSERT(WABT_ARRAY_SIZE(g_reloc_type_name) == kRelocTypeCount);
 
-#ifndef SECURE_ENCLAVE_ENV
+#ifndef DECENT_ENCLAVE_TRUSTED
 static Result ReadStdin(std::vector<uint8_t>* out_data) {
   out_data->resize(0);
   uint8_t buffer[4096];
@@ -147,6 +147,6 @@ void InitStdio() {
   }
 #endif
 }
-#endif /* !SECURE_ENCLAVE_ENV */
+#endif /* !DECENT_ENCLAVE_TRUSTED */
 
 }  // namespace wabt

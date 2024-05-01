@@ -93,7 +93,7 @@
 #define WABT_STATIC_ASSERT(x) _Static_assert((x), #x)
 #endif
 
-#elif COMPILER_IS_MSVC && defined(INTEL_SGX)
+#elif COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
 
 #include <string.h>
 
@@ -292,7 +292,7 @@ int wabt_snprintf(char* str, size_t size, const char* format, ...);
 #error no snprintf
 #endif
 
-#ifdef SECURE_ENCLAVE_ENV
+#ifdef DECENT_ENCLAVE_TRUSTED
 #define wabt_fprintf(T, ...)
 inline char* wabt_strcpy(char* dest, const char* src)
 { // src: https://www.techiedelight.com/implement-strcpy-function-c/
@@ -305,9 +305,9 @@ inline char* wabt_strcpy(char* dest, const char* src)
 #else
 #define wabt_fprintf fprintf
 #define wabt_strcpy strcpy
-#endif /* SECURE_ENCLAVE_ENV */
+#endif /* DECENT_ENCLAVE_TRUSTED */
 
-#if COMPILER_IS_MSVC && defined(INTEL_SGX)
+#if COMPILER_IS_MSVC && defined(DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED)
 #define wabt_vsnprintf vsnprintf
 #else
 #if COMPILER_IS_MSVC

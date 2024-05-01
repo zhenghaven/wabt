@@ -19,7 +19,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-#ifndef SECURE_ENCLAVE_ENV
+#ifndef DECENT_ENCLAVE_TRUSTED
 #if COMPILER_IS_MSVC && _M_X64
 #include <emmintrin.h>
 #elif COMPILER_IS_MSVC && _M_IX86
@@ -135,7 +135,7 @@ float wabt_convert_uint64_to_float(uint64_t x) {
   return static_cast<float>(x);
 #endif
 }
-#endif /* !SECURE_ENCLAVE_ENV */
+#endif /* !DECENT_ENCLAVE_TRUSTED */
 
 double wabt_convert_int64_to_double(int64_t x) {
 #if COMPILER_IS_MSVC && _M_IX86
