@@ -193,6 +193,13 @@ if(${DECENTWABT_ENABLE_ENCLAVE})
 			$<$<COMPILE_LANGUAGE:CXX>:${DECENTENCLAVE_SGXSDK_TRUSTED_CXX_FLAGS}>
 	)
 
+	target_link_libraries(
+		DecentWasmWat_core_trusted
+		PUBLIC
+			IntelSGX::Trusted::stdc
+			IntelSGX::Trusted::cxx
+	)
+
 	target_link_options(
 		DecentWasmWat_core_trusted
 		PRIVATE

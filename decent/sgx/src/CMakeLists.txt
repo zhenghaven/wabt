@@ -8,13 +8,13 @@ cmake_minimum_required(VERSION 3.15)
 if(${DECENTWABT_ENABLE_ENCLAVE})
 	add_library(
 		DecentWasmWat_trusted
-			STATIC
+		STATIC
 			${CMAKE_CURRENT_LIST_DIR}/WasmWat.cc
 	)
 
 	target_include_directories(
 		DecentWasmWat_trusted
-			PRIVATE
+		PRIVATE
 			${WABT_SOURCES_ROOT_DIR}
 			${DECENTENCLAVE_SGXSDK_INCLUDE}
 			${DECENTENCLAVE_SGXSDK_INCLUDE_C}
@@ -22,25 +22,29 @@ if(${DECENTWABT_ENABLE_ENCLAVE})
 			${CMAKE_CURRENT_LIST_DIR}/../include
 	)
 
-	#target_link_libraries(DecentWasmWat_trusted DecentWasmWat_core_trusted)
-
 	target_compile_definitions(
 		DecentWasmWat_trusted
-			PRIVATE
+		PRIVATE
 			DECENT_ENCLAVE_TRUSTED
 			DECENT_ENCLAVE_PLATFORM_SGX_TRUSTED
 	)
 
 	target_compile_options(
 		DecentWasmWat_trusted
-			PRIVATE
+		PRIVATE
 			${DECENTENCLAVE_SGXSDK_TRUSTED_C_FLAGS}
 			$<$<COMPILE_LANGUAGE:CXX>:${DECENTENCLAVE_SGXSDK_TRUSTED_CXX_FLAGS}>
 	)
 
+	target_link_libraries(
+		DecentWasmWat_trusted
+		PUBLIC
+			DecentWasmWat_core_trusted
+	)
+
 	target_link_options(
 		DecentWasmWat_trusted
-			PRIVATE
+		PRIVATE
 			${DECENTENCLAVE_SGXSDK_TRUSTED_LINKER_FLAGS}
 	)
 
@@ -63,21 +67,22 @@ endif()
 
 add_library(
 	DecentWasmWat_untrusted
-		STATIC
+	STATIC
 		${CMAKE_CURRENT_LIST_DIR}/WasmWat.cc
 )
 
 target_include_directories(
 	DecentWasmWat_untrusted
-		PRIVATE
+	PRIVATE
 		${WABT_SOURCES_ROOT_DIR}
 		${CMAKE_CURRENT_LIST_DIR}/../include
 )
 
-# target_link_libraries(
-# 	DecentWasmWat_untrusted
-# 	DecentWasmWat_core_untrusted
-# )
+target_link_libraries(
+	DecentWasmWat_untrusted
+	PUBLIC
+		DecentWasmWat_core_untrusted
+)
 
 set_property(
 	TARGET DecentWasmWat_untrusted
