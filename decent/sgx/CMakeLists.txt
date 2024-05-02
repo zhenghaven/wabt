@@ -210,7 +210,7 @@ if(${DECENTWABT_ENABLE_ENCLAVE})
 		TARGET DecentWasmWat_core_trusted
 		PROPERTY
 			MSVC_RUNTIME_LIBRARY
-			"MultiThreaded$<$<OR:$<CONFIG:Debug>, $<CONFIG:DebugSimulation> >:Debug>"
+			"MultiThreaded$<$<OR:$<CONFIG:Debug>,$<CONFIG:DebugSimulation>>:Debug>"
 	)
 	set_property(
 		TARGET DecentWasmWat_core_trusted
@@ -242,7 +242,8 @@ target_compile_options(
 set_property(
 	TARGET DecentWasmWat_core_untrusted
 	PROPERTY
-		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+		MSVC_RUNTIME_LIBRARY
+		"MultiThreaded$<$<OR:$<CONFIG:Debug>,$<CONFIG:DebugSimulation>>:Debug>"
 )
 set_property(
 	TARGET DecentWasmWat_core_untrusted
